@@ -1,16 +1,11 @@
-# aplikasi_profil_kampus
+Aplikasi ini dibangun dengan Flutter dan GetX. Titik awalnya ada di `main.dart` yang memakai `GetMaterialApp` sebagai root widget. Di sini ditentukan judul aplikasi, tema Material 3, **route awal** (`initialRoute: Routes.home`), dan **daftar halaman** (`getPages: AppPages.routes`). Begitu aplikasi dijalankan, GetX langsung mengarahkan ke rute `/` (Home) sesuai konstanta di kelas `Routes`.
 
-A new Flutter project.
+Manajemen rute dipusatkan di `app/routes/app_pages.dart` dan `app/routes/app_routes.dart`. File `app_pages.dart` mendefinisikan **list `GetPage`** untuk tiap layar: Home, Profil Kampus, Visi & Misi, Program Studi, dan Kontak. Setiap `GetPage` berisi `name` (alamat rute), `page` (widget view yang akan ditampilkan), **binding** untuk menyiapkan controllernya, serta **transisi** (di sini `Transition.fadeIn` berdurasi ~180ms agar perpindahan halaman terasa halus). Sementara itu, `app_routes.dart` menyimpan **nama-nama rute sebagai `static const`** (mis. `Routes.home = '/'`, `Routes.profil = '/profil'`, dst.) sehingga rute bersifat statis, konsisten, dan aman dari salah ketik saat dipanggil di seluruh aplikasi.
 
-## Getting Started
+Navigasi antar halaman ditangani oleh **Drawer** yang didefinisikan di `app/widgets/app_drawer.dart`. Drawer menampilkan daftar menu berbasis `ListTile` (Home, Profil Kampus, Visi & Misi, Program Studi, Kontak). Ketika salah satu item ditekan, kode memanggil `Get.toNamed(route)` untuk berpindah ke halaman tujuan, diawali dengan `Get.back()` untuk menutup Drawer dulu. Karena semua rute sudah didefinisikan di `Routes`, pemanggilan jadi ringkas dan konsisten, misalnya `Get.toNamed(Routes.profil)`.
 
-This project is a starting point for a Flutter application.
+Setiap halaman disusun sebagai **module** di dalam `app/modules/<nama_modul>/`. Masing-masing modul minimal berisi dua file: `controllers/<nama>_controller.dart` dan `views/<nama>_view.dart`. Controller mewarisi `GetxController` (saat ini sengaja kosong karena konten bersifat statis; nanti jika butuh state/logic reaktif bisa ditambahkan properti `.obs` di sini). View mewarisi `GetView<Controller>` agar mudah mengakses controller bila diperlukan. Di dalam View, struktur dasar memakai `Scaffold` dengan **`AppBar` sebagai judul**, **`drawer: AppDrawer()`** untuk menampilkan navigasi di samping, dan **`body`** berisi konten halaman.
 
-A few resources to get you started if this is your first Flutter project:
+Konten tiap halaman dibuat konsisten dan rapi menggunakan **widget custom** `InfoCard` yang didefinisikan di `app/widgets/info_card.dart`. `InfoCard` menerima tiga properti—`icon`, `title`, dan `description`—lalu merendernya sebagai sebuah `Card` dengan ikon di sisi kiri dan teks di sisi kanan. Dengan pola ini, halaman Home, Profil, Visi & Misi, Program Studi, hingga Kontak bisa menampilkan **judul, deskripsi, dan ikon** secara seragam tanpa pengulangan kode.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Alur kerjanya sederhana: saat aplikasi start, `GetMaterialApp` memuat rute awal Home → `GetPage` Home menjalankan **binding** (mendaftarkan `HomeController`) → **HomeView** dirender. Ketika pengguna memilih menu di Drawer, dipanggil `Get.toNamed(...)` → GetX mencocokkan rute ke `GetPage` terkait → menjalankan binding controller halaman tujuan → merender view dengan **transisi fade**. Karena **rute dikelola statis** di `Routes` dan **binding** terpusat di `AppPages`, struktur aplikasi menjadi modular, mudah dibaca, mudah dikembangkan (tinggal menambah satu modul baru + satu `GetPage`), dan memenuhi persyaratan tugas: Flutter + GetX, navigasi `Get.toNamed()`, AppBar + Drawer, serta minimal satu widget custom terpisah.
