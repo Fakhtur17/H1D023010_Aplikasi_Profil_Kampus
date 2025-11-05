@@ -18,7 +18,7 @@ class HomeView extends GetView<HomeController> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const SizedBox(height: 8),
-            const FlutterLogo(size: 120),
+            Image.asset('assets/logo_kampus.png', height: 120),
             const SizedBox(height: 12),
             Text(
               'Universitas Teknik Nusantara',
